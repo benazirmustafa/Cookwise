@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% if request.user.is_company%}
+        <br/>
+        {% if list_of_ingrediants %}
+        <h3>List of ingrediants according to search count</h3>
+        <ul>
+        {% for ing in list_of_ingrediants %}
+            <li><h4>{{ ing.name }} :: count: {{ ing.count }}</h4></li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        
+        <br/>
+        <br/>
+<form method="POST" action="{% url 'search_ingredients' %}" class="form">
+          {% csrf_token %}
+          <div >
+            <select name="score" id="score">
+              <option disabled selected value> 
+              <option value=1>1 star & up</option>
+              <option value=2>2 star & up</option>
+              <option value=3>3 star & up</option>
+              <option value=4>4 star & up</option>
+              <option value=5>5 star & up</option>
+            </select>        
+        </div>
+        <!-- <input type="submit" value="Filter Recipe"> -->
+          <input type="submit" value="Search">
+      </form>
+      <br/>
+      <br/>
+      {% if searched_filter_score %}
+      <h4>Rating: {% for o in searched_filter_score %} {{o}}{% endfor %}</h4>
+      {% endif %}
+      <br/>
+      {% if list_of_recipes %}  
+      <h3>List of recipes according to their rating</h3>
+
+      <ul>
+      {% for recipe in list_of_recipes %}
+          <li><h4><a href="{% url 'recipes_detail' recipe.id %}">{{ recipe.name }}</a></h4></li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+{% else %}
+<a href="{% url 'recipe_create' %}">Upload Recipe</a>
+<br/>
+Search any recipe by providing your ingredients....
+        <br/> <br/> <br/>
+        <form method="POST" action="{% url 'search_ingredients' %}" class="form">
+          {% csrf_token %}
+          <div >
+            <div class="ingredients">
+              <input required name="name" id="id" type="text" value="">
+              <a class="extra-fields-ingredients" href="#">Add More Ingredients</a>
+            </div>          
+            <div class="ingredients_dynamic"></div>
+          
+          </div>
+
+          <div >
+            <select name="score" id="score">
+              <option disabled selected value> 
+              <option value=1>1 star & up</option>
+              <option value=2>2 star & up</option>
+              <option value=3>3 star & up</option>
+              <option value=4>4 star & up</option>
+              <option value=5>5 star & up</option>
+            </select>        
+        </div>
+        <!-- <input type="submit" value="Filter Recipe"> -->
+          <input type="submit" value="Search">
+      </form>
+      <br/>
+      <br/>
+      {% if searched_ingrediants %}
+      <h4>Ingrediants: {% for o in searched_ingrediants %} {{o}}{% endfor %}</h4>
+      {% endif %}
+      <br/>
+      {% if searched_filter_score %}
+      <h4>Rating: {% for o in searched_filter_score %} {{o}}{% endfor %}</h4>
+      {% endif %}
+      <br/>
+      {% if list_of_recipes %}  
+      <ul>
+      {% for recipe in list_of_recipes %}
+          <li><h4><a href="{% url 'recipes_detail' recipe.id %}">{{ recipe.name }}</a></h4></li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+{% endif %}
+        
+{% endblock %}
+{% block external_js %}
+<script type="text/javascript">
+  $('.extra-fields-ingredients').click(function() {
+  $('.ingredients').clone().appendTo('.ingredients_dynamic');
+  $('.ingredients_dynamic .ingredients').addClass('single remove');
+  $('.ingredients_dynamic .ingredients input').val("")
+
+  $('.single .extra-fields-ingredients').remove();
+  $('.single').append('<a href="#" class="remove-field btn-remove-customer">Remove</a>');
+  $('.ingredients_dynamic > .single').attr("class", "remove");
+
+  $('.ingredients_dynamic input').each(function() {
+    var count = 0;
+    var fieldname = $(this).attr("name");
+    count++;
+  });
+
+});
+
+$(document).on('click', '.remove-field', function(e) {
+  $(this).parent('.remove').remove();
+  e.preventDefault();
+});
+</script>
+{% endblock %}
+</html>
